@@ -8,7 +8,7 @@ message("FOOBAR_LIBRARIES:${FOOBAR_LIBRARIES}")
 
 add_executable(main main.cpp)
 target_include_directories(main PUBLIC ${FOOBAR_INCLUDE_DIRS})
-target_link_libraries(main foo)
+target_link_libraries(main FooBar::foo)
 
 
 
