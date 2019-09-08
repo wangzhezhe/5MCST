@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <UnstructuredGrid>
+    <Piece NumberOfPoints="24"                   NumberOfCells="6"                   >
+      <PointData Normals="Normals" TCoords="TCoords">
+        <DataArray type="Float32" Name="Normals" NumberOfComponents="3" format="appended" RangeMin="1"                    RangeMax="1"                    offset="0"                   />
+        <DataArray type="Float32" Name="TCoords" NumberOfComponents="2" format="appended" RangeMin="0"                    RangeMax="1.4142135624"         offset="60"                  />
+      </PointData>
+      <CellData>
+      </CellData>
+      <Points>
+        <DataArray type="Float32" Name="Points" NumberOfComponents="3" format="appended" RangeMin="0.86602540378"        RangeMax="0.86602540378"        offset="148"                 />
+      </Points>
+      <Cells>
+        <DataArray type="Int64" IdType="1" Name="connectivity" format="appended" RangeMin=""                     RangeMax=""                     offset="232"                 />
+        <DataArray type="Int64" IdType="1" Name="offsets" format="appended" RangeMin=""                     RangeMax=""                     offset="320"                 />
+        <DataArray type="UInt8" Name="types" format="appended" RangeMin=""                     RangeMax=""                     offset="376"                 />
+      </Cells>
+    </Piece>
+  </UnstructuredGrid>
+  <AppendedData encoding="base64">
+   _AQAAAACAAAAgAQAAGQAAAA==eJxjYGjYzwAHRLHtSWMTbe6gtAMA+HsX6Q==AQAAAACAAADAAAAAMAAAAA==eJxjYICBBnsGFDYMMzRAxfbDJKFy+5HkoRgsth+NzYBqBkwPzAyC5uN1HwAg/hvpAQAAAACAAAAgAQAALAAAAA==eJxjYGDYz4CJ7dFoGNseixg2OWxq0c3HZQ4+ewmZj4uPSy02e1EwAPIUI7k=AQAAAACAAADAAAAALgAAAA==eJxjYoAARgZUwAKlmdHkmdDkcaljRROHqYPpZ0NTh24Oujwbmjw7lAYAGzgAVQ==AQAAAACAAAAwAAAAGAAAAA==eJxjYYAADijNA6UFoLQIlJaA0gAHMABVAQAAAACAAAAGAAAACwAAAA==eJzj4gIBAADYAD0=
+  </AppendedData>
+</VTKFile>
