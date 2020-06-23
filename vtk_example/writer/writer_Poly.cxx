@@ -1,9 +1,10 @@
-
 //refer to https://lorensen.github.io/VTKExamples/site/Cxx/Filtering/Delaunay2D/
 //refer to https://vtk.org/Wiki/VTK/Examples/Boneyard/Cxx/Modelling/Delaunay3DAlpha
 
 
 #include <vtkPolyDataReader.h>
+#include <vtkUnstructuredGridWriter.h>
+
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
 #include <vtkDelaunay3D.h>
@@ -37,21 +38,39 @@ int main(int argc, char *argv[])
     delaunay->Update();
 
 
-    // Write the file
+    // Write the file by vtkXMLDataSetWriter
     vtkSmartPointer<vtkXMLDataSetWriter> writer =
         vtkSmartPointer<vtkXMLDataSetWriter>::New();
-    writer->SetFileName("./delaunay_3dbox.vtk");
+    writer->SetFileName("./delaunay_3dbox.xml");
+
+    // get the specific polydata and check the results
+    writer->SetInputConnection(delaunay->GetOutputPort());
+    // writer->SetInputData(delaunay->GetOutputPort());
+    // Optional - set the mode. The default is binary.
+    writer->SetDataModeToBinary();
+    // writer->SetDataModeToAscii();
+    writer->Write();
+
+
+
+
+    // write the file by 
+    // Write the file by vtkXMLDataSetWriter
+    vtkSmartPointer<vtkUnstructuredGridWriter> polywriter =
+        vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+    polywriter->SetFileName("./delaunay_3dbox_unstructure.vtk");
 
     // get the specific polydata and check the results
     // writer->SetInputData???
-    writer->SetInputConnection(delaunay->GetOutputPort());
-
+    polywriter->SetInputConnection(delaunay->GetOutputPort());
+    //polywriter->SetInputData(delaunay->GetOutputPort());
 
     // Optional - set the mode. The default is binary.
-    //writer->SetDataModeToBinary();
-    //writer->SetDataModeToAscii();
-    writer->Write();
+    writer->SetDataModeToBinary();
+    //polywriter->SetDataModeToAscii();
+    polywriter->Write();
 
-    std::cout << "ok to write vtp file"<< std::endl;
+
+    std::cout << "ok to write by polywriter"<< std::endl;
     return 0;
 }

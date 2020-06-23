@@ -55,7 +55,7 @@ void Possion2d::init(MPI_Comm &cart_comm)
     {
 
         this->m_cellValue = u_exact(phy_x, phy_y);
-        std::cout << "uexact x " << phy_x << " y " << phy_y << std::endl;
+        //std::cout << "uexact x " << phy_x << " y " << phy_y << std::endl;
         this->m_fb = u_exact(phy_x, phy_y);
     }
     else
@@ -64,7 +64,7 @@ void Possion2d::init(MPI_Comm &cart_comm)
         this->m_fb = -uxxyy_exact(phy_x, phy_y);
     }
 
-    std::cout << "m_x " << m_x << " m_y " << m_y << " m_l " << this->m_left << " m_r " << this->m_right << " m_d " << this->m_down << " m_u " << this->m_up << " fb " << this->m_fb << std::endl;
+    //std::cout << "m_x " << m_x << " m_y " << m_y << " m_l " << this->m_left << " m_r " << this->m_right << " m_d " << this->m_down << " m_u " << this->m_up << " fb " << this->m_fb << std::endl;
 
     MPI_Cart_shift(cart_comm, 1, 1, &m_leftId, &m_rightId);
     MPI_Cart_shift(cart_comm, 0, 1, &m_downId, &m_upId);

@@ -5,7 +5,7 @@
 #include <stdexcept>
 
 #include "mpi.h"
-#include "possion2d.hpp"
+#include "possion2dhybrid.hpp"
 #define BILLION 1000000000L
 
 int main(int argc, char *argv[]) {
@@ -15,20 +15,27 @@ int main(int argc, char *argv[]) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &procs);
 
-  if (argc != 2) {
-    throw std::runtime_error("<possion2d> <gridLen>");
+  if (argc != 3) {
+    throw std::runtime_error("./possion2dhybrid <globalLen> <localLen>");
   }
-  // the len of the grid should larger than 3
-  int len = std::stoi(argv[1]);
 
-  if (len * len != procs) {
+  int globalLen = std::stoi(argv[1]);
+  int localLen = std::stoi(argv[2]);
+  if (globalLen % localLen != 0) {
     throw std::runtime_error(
-        "the total number of process should equal to len*len");
+        "globalLen should be integer multiples then localLen");
+  }
+
+  int partitionNum1D = globalLen / localLen;
+  int blockNum = partitionNum1D * partitionNum1D;
+  if (blockNum != procs) {
+    throw std::runtime_error(
+        "the total number of MPI process should equal to the block numbers");
   }
 
   // generate dims
   // assign it manully if you want a square
-  int dims[2] = {len, len};
+  int dims[2] = {partitionNum1D, partitionNum1D};
   // MPI_Dims_create(procs, 2, dims);
   if (rank == 0) {
     std::cout << "dim 1(y) " << dims[0] << " dim 2(x) " << dims[1] << std::endl;
@@ -37,19 +44,20 @@ int main(int argc, char *argv[]) {
   int reorder = 0;
 
   // generate coordinates
-  int coord[2] = {};
+  int blockCoord[2] = {};
   MPI_Comm cart_comm;
   MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periodical, reorder, &cart_comm);
-  MPI_Cart_coords(cart_comm, rank, 2, coord);
+  MPI_Cart_coords(cart_comm, rank, 2, blockCoord);
 
-  int x = coord[1];
-  int y = coord[0];
+  int blockx = blockCoord[1];
+  int blocky = blockCoord[0];
 
   // init the dimention and the cartition
-  Possion2d p2d(rank, len, x, y);
+  Possion2dHybrid p2d(rank, globalLen, localLen, partitionNum1D, blockx,
+                      blocky);
 
   // init the possion2d
-  p2d.init(cart_comm);
+  p2d.init(rank, cart_comm);
   struct timespec start, end;
   double diff;
 
@@ -59,21 +67,28 @@ int main(int argc, char *argv[]) {
   }
 
   // call the iteration
-  for (int i = 1; i < 50; i++) {
-    //if (rank == 0) {
+  p2d.printInfoGetDiff(rank, procs);
+
+  for (int i = 1; i < 100; i++) {
+    MPI_Barrier(MPI_COMM_WORLD);
+    // if (rank == 0) {
     //  std::cout << "iterate step " << i << std::endl;
     //}
     // double diff = p2d.printInfoGetDiff(rank, procs, len, i);
-    // if (rank == 0)
-    //{
-    //    std::cout << "diff " << diff << std::endl;
+    //if (rank == 0) {
+    //  std::cout << "iteration " << i << std::endl;
     //}
     // exchange value firstly
+
     p2d.exchange();
+
+    p2d.printInfo(rank);
+
     // update the vlaue in current cell
     p2d.iterate();
-    MPI_Barrier(MPI_COMM_WORLD);
   }
+
+  p2d.printInfoGetDiff(rank, procs);
 
   if (rank == 0) {
     // some functions here

@@ -1,14 +1,15 @@
-//refer to https://people.sc.fsu.edu/~jburkardt/cpp_src/poisson_serial/poisson_serial.html
-#include <cstdlib>
-#include <iostream>
-#include <iomanip>
-#include <ctime>
+// refer to
+// https://people.sc.fsu.edu/~jburkardt/cpp_src/poisson_serial/poisson_serial.html
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+#include <iostream>
 
 using namespace std;
 
-#define NX 5
-#define NY 5
+#define NX 80
+#define NY 80
 
 int main(int argc, char *argv[]);
 double r8mat_rms(int m, int n, double a[NX][NY]);
@@ -54,7 +55,8 @@ int main(int argc, char *argv[])
 //
 //    The Jacobi iteration is repeatedly applied until convergence is detected.
 //
-//    For convenience in writing the discretized equations, we assume that NX = NY.
+//    For convenience in writing the discretized equations, we assume that NX =
+//    NY.
 //
 //  Licensing:
 //
@@ -77,7 +79,7 @@ int main(int argc, char *argv[])
   double f[NX][NY];
   int i;
   int it;
-  int it_max = 1000;
+  int it_max = 30;
   int j;
   int nx = NX;
   int ny = NY;
@@ -120,16 +122,11 @@ int main(int argc, char *argv[])
   //  Set the initial solution estimate.
   //  We are "allowed" to pick up the boundary conditions exactly.
   //
-  for (j = 0; j < ny; j++)
-  {
-    for (i = 0; i < nx; i++)
-    {
-      if (i == 0 || i == nx - 1 || j == 0 || j == ny - 1)
-      {
+  for (j = 0; j < ny; j++) {
+    for (i = 0; i < nx; i++) {
+      if (i == 0 || i == nx - 1 || j == 0 || j == ny - 1) {
         unew[i][j] = f[i][j];
-      }
-      else
-      {
+      } else {
         unew[i][j] = 0.0;
       }
     }
@@ -138,13 +135,11 @@ int main(int argc, char *argv[])
   //
   //  Set up the exact solution.
   //
-  for (j = 0; j < ny; j++)
-  {
+  for (j = 0; j < ny; j++) {
     y = (double)(j) / (double)(ny - 1);
-    for (i = 0; i < nx; i++)
-    {
+    for (i = 0; i < nx; i++) {
       x = (double)(i) / (double)(nx - 1);
-      std::cout << "exact input x " << x << " y " << y << std::endl;
+      // std::cout << "exact input x " << x << " y " << y << std::endl;
       uexact[i][j] = u_exact(x, y);
     }
   }
@@ -159,29 +154,23 @@ int main(int argc, char *argv[])
   cout << "  Step    ||Unew||     ||Unew-U||     ||Unew-Exact||\n";
   cout << "\n";
 
-  for (j = 0; j < ny; j++)
-  {
-    for (i = 0; i < nx; i++)
-    {
+  for (j = 0; j < ny; j++) {
+    for (i = 0; i < nx; i++) {
       udiff[i][j] = unew[i][j] - uexact[i][j];
     }
   }
   error = r8mat_rms(nx, ny, udiff);
-  cout << "  " << setw(4) << 0
-       << "  " << setw(14) << unew_norm
-       << "  "
+  cout << "  " << setw(4) << 0 << "  " << setw(14) << unew_norm << "  "
        << "              "
        << "  " << setw(14) << error << "\n";
 
   // update the current u, make it to be the latest unew
-  for (it = 1; it <= it_max; it++)
-  {
-    for (j = 0; j < ny; j++)
-    {
-      for (i = 0; i < nx; i++)
-      {
+  for (it = 1; it <= it_max; it++) {
+    for (j = 0; j < ny; j++) {
+      for (i = 0; i < nx; i++) {
         u[i][j] = unew[i][j];
-        std::cout << "i " << i << " j " << j << " " << u[i][j] << std::endl;
+        //std::cout << "j " << j + 1 << " i " << i + 1  << " value " <<u[i][j]
+        //          << std::endl;
       }
     }
 
@@ -196,42 +185,32 @@ int main(int argc, char *argv[])
     u_norm = unew_norm;
     unew_norm = r8mat_rms(nx, ny, unew);
 
-    for (j = 0; j < ny; j++)
-    {
-      for (i = 0; i < nx; i++)
-      {
+    for (j = 0; j < ny; j++) {
+      for (i = 0; i < nx; i++) {
         udiff[i][j] = unew[i][j] - u[i][j];
       }
     }
     diff = r8mat_rms(nx, ny, udiff);
 
-    for (j = 0; j < ny; j++)
-    {
-      for (i = 0; i < nx; i++)
-      {
+    for (j = 0; j < ny; j++) {
+      for (i = 0; i < nx; i++) {
         udiff[i][j] = unew[i][j] - uexact[i][j];
       }
     }
     error = r8mat_rms(nx, ny, udiff);
 
-    cout << "  " << setw(4) << it
-         << "  " << setw(14) << unew_norm
-         << "  " << setw(14) << diff
-         << "  " << setw(14) << error << "\n";
+    cout << "  " << setw(4) << it << "  " << setw(14) << unew_norm << "  "
+         << setw(14) << diff << "  " << setw(14) << error << "\n";
 
-    if (diff <= tolerance)
-    {
+    if (diff <= tolerance) {
       converged = true;
       break;
     }
   }
 
-  if (converged)
-  {
+  if (converged) {
     cout << "  The iteration has converged.\n";
-  }
-  else
-  {
+  } else {
     cout << "  The iteration has NOT converged.\n";
   }
   //
@@ -282,10 +261,8 @@ double r8mat_rms(int nx, int ny, double a[NX][NY])
 
   v = 0.0;
 
-  for (j = 0; j < ny; j++)
-  {
-    for (i = 0; i < nx; i++)
-    {
+  for (j = 0; j < ny; j++) {
+    for (i = 0; i < nx; i++) {
       v = v + a[i][j] * a[i][j];
     }
   }
@@ -351,23 +328,19 @@ void rhs(int nx, int ny, double f[NX][NY])
   double y;
   //
   //  The "boundary" entries of F store the boundary values of the solution.
-  //  The "interior" entries of F store the right hand sides of the Poisson equation.
+  //  The "interior" entries of F store the right hand sides of the Poisson
+  //  equation.
   //
-  for (j = 0; j < ny; j++)
-  {
+  for (j = 0; j < ny; j++) {
     y = (double)(j) / (double)(ny - 1);
-    for (i = 0; i < nx; i++)
-    {
+    for (i = 0; i < nx; i++) {
       x = (double)(i) / (double)(nx - 1);
-      if (i == 0 || i == nx - 1 || j == 0 || j == ny - 1)
-      {
+      if (i == 0 || i == nx - 1 || j == 0 || j == ny - 1) {
         f[i][j] = u_exact(x, y);
-      }
-      else
-      {
+      } else {
         f[i][j] = -uxxyy_exact(x, y);
       }
-      std::cout << " i " << i << " j " << j << " f " << f[i][j] << std::endl;
+      // std::cout << " i " << i << " j " << j << " f " << f[i][j] << std::endl;
     }
   }
 
@@ -379,7 +352,7 @@ void rhs(int nx, int ny, double f[NX][NY])
 }
 
 //****************************************************************************80
-//execute one step Jacobi iteration
+// execute one step Jacobi iteration
 void sweep(int nx, int ny, double dx, double dy, double f[NX][NY],
            double u[NX][NY], double unew[NX][NY])
 
@@ -417,24 +390,26 @@ void sweep(int nx, int ny, double dx, double dy, double f[NX][NY],
   int i;
   int j;
 
-  for (j = 0; j < ny; j++)
-  {
-    for (i = 0; i < nx; i++)
-    {
-      if (i == 0 || j == 0 || i == nx - 1 || j == ny - 1)
-      {
+  for (j = 0; j < ny; j++) {
+    for (i = 0; i < nx; i++) {
+      if (i == 0 || j == 0 || i == nx - 1 || j == ny - 1) {
         unew[i][j] = f[i][j];
+      } else {
+        unew[i][j] = 0.25 * (u[i - 1][j] + u[i][j + 1] + u[i][j - 1] +
+                             u[i + 1][j] + f[i][j] * dx * dy);
       }
-      else
-      {
-        unew[i][j] = 0.25 * (u[i - 1][j] + u[i][j + 1] + u[i][j - 1] + u[i + 1][j] + f[i][j] * dx * dy);
-      }
+
+      //if ((i + 1) == 3 && (j + 1) == 2) {
+      //  std::cout << "debug " << u[i - 1][j] << "," << u[i + 1][j] << ","
+      //            << u[i][j - 1] << "," << u[i][j + 1] << "," << f[i][j] << ","
+      //            << dx << "," << dy << std::endl;
+      //}
     }
   }
   return;
 }
 //****************************************************************************80
-//print out the current system time
+// print out the current system time
 void timestamp()
 
 //****************************************************************************80
@@ -475,13 +450,13 @@ void timestamp()
 
   std::strftime(time_buffer, TIME_SIZE, "%d %B %Y %I:%M:%S %p", tm_ptr);
 
-  std::cout << time_buffer << "\n";
+  // std::cout << time_buffer << "\n";
 
   return;
 #undef TIME_SIZE
 }
 //****************************************************************************80
-//caculate the exact phi
+// caculate the exact phi
 double u_exact(double x, double y)
 
 //****************************************************************************80
@@ -518,7 +493,7 @@ double u_exact(double x, double y)
   return value;
 }
 //****************************************************************************80
-//caculate the exact f(x,y)
+// caculate the exact f(x,y)
 double uxxyy_exact(double x, double y)
 
 //****************************************************************************80
