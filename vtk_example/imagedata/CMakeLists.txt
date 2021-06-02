@@ -3,6 +3,9 @@ project (vtkcommunicator LANGUAGES C CXX)
 
 find_package(VTK COMPONENTS
 CommonDataModel
+FiltersCore
+IOImage
+IOXML
 )
 
 add_executable(test_imagedata test_imagedata.cpp)

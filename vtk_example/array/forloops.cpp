@@ -13,8 +13,7 @@
 // refer to https://blog.kitware.com/c11-for-range-support-in-vtk/
 // refer to https://blog.kitware.com/new-data-array-layouts-in-vtk-7-1/
 // refer to https://blog.kitware.com/working-with-vtkdataarrays-2019-edition/
-
-// array layout
+// refer to https://discourse.vtk.org/t/get-the-raw-pointer-from-the-vtkpoints/4894/12
 
 // using naive way to go through the array
 void naivemag3(vtkDataArray *vectors, vtkDataArray *magnitudes) {
@@ -77,11 +76,13 @@ void mag3GetPointer(vtkDataArray *vecs, vtkDataArray *mags) {
 
 // mag3 explicit types
 // not sure how to create the vtkGenericDataArray
-template <typename D1, typename T1, typename D2, typename T2>
-void mag3Explicit(vtkGenericDataArray<D1, T1> *vectors,
-                  vtkGenericDataArray<D2, T2> *magnitudes) {
-  using VecType = T1;
-  using MagType = T2;
+template <typename ArrayT1, typename ArrayT2>
+void mag3Explicit(ArrayT1 *vectors, ArrayT2 *magnitudes)
+
+{
+  std::cout << "------test mag3Explicit" << std::endl;
+  using VecType = typename ArrayT1::ValueType;
+  using MagType = typename ArrayT2::ValueType;
 
   const vtkIdType numTuples = vectors->GetNumberOfTuples();
 
@@ -92,6 +93,7 @@ void mag3Explicit(vtkGenericDataArray<D1, T1> *vectors,
       mag += static_cast<MagType>(comp * comp);
     }
     mag = std::sqrt(mag);
+    std::cout << "mag " << mag << std::endl;
     magnitudes->SetTypedComponent(t, 0, mag);
   }
 }
@@ -130,10 +132,7 @@ struct Mag3Worker1 {
   }
 };
 
-/*
-error: no type named 'ComponentType' in 'struct
-vtk::detail::ValueRange<vtkDataArray, 1>'
-*/
+
 struct Mag3Worker2 {
   template <typename VecArray, typename MagArray>
   void operator()(VecArray *vecs, MagArray *mags) {
@@ -158,9 +157,6 @@ struct Mag3Worker2 {
   }
 };
 
-// error: no type named 'ComponentType' in 'struct
-// vtk::detail::ValueRange<vtkDataArray, 1>'
-//  164 |     using MagType = typename decltype(magRange)::ComponentType;
 struct Mag3Worker3 {
   template <typename VecArray, typename MagArray>
   void operator()(VecArray *vecs, MagArray *mags) {
@@ -171,12 +167,12 @@ struct Mag3Worker3 {
     const auto vecRange = vtk::DataArrayTupleRange<3>(vecs);
     auto magRange = vtk::DataArrayValueRange<1>(mags);
 
-    //using VecTuple = typename decltype(vecRange)::ComponentType;
-    //using MagType = typename decltype(magRange)::ValueType;
-    
-    using VecTuple = typename decltype(vecRange)::const_reference; 
+    // using VecTuple = typename decltype(vecRange)::ComponentType;
+    // using MagType = typename decltype(magRange)::ValueType;
+
+    using VecTuple = typename decltype(vecRange)::const_reference;
     using MagType = typename decltype(magRange)::ValueType;
-    
+
     // Per-tuple magnitude functor for std::transform:
     auto computeMag = [](const VecTuple &tuple) -> MagType {
       MagType mag = 0;
@@ -204,12 +200,10 @@ void mag3Dispatch1(vtkDataArray *vecs, vtkDataArray *mags) {
       vtkArrayDispatch::Dispatch2ByValueType<vtkArrayDispatch::Reals,
                                              vtkArrayDispatch::Reals>;
 
-
   if (!Dispatcher::Execute(vecs, mags, worker1)) {
     // Otherwise fallback to using the vtkDataArray API.
     worker1(vecs, mags);
   }
-
 }
 
 void mag3Dispatch2(vtkDataArray *vecs, vtkDataArray *mags) {
@@ -225,11 +219,10 @@ void mag3Dispatch2(vtkDataArray *vecs, vtkDataArray *mags) {
 
   // Generate optimized workers when mags/vecs are both float|double
   if (!Dispatcher::Execute(vecs, mags, worker2)) {
-  // Otherwise fallback to using the vtkDataArray API.
+    // Otherwise fallback to using the vtkDataArray API.
     worker2(vecs, mags);
   }
 }
-
 
 void mag3Dispatch3(vtkDataArray *vecs, vtkDataArray *mags) {
   std::cout << "------test mag3Dispatch3" << std::endl;
@@ -244,11 +237,10 @@ void mag3Dispatch3(vtkDataArray *vecs, vtkDataArray *mags) {
 
   // Generate optimized workers when mags/vecs are both float|double
   if (!Dispatcher::Execute(vecs, mags, worker3)) {
-  // Otherwise fallback to using the vtkDataArray API.
+    // Otherwise fallback to using the vtkDataArray API.
     worker3(vecs, mags);
   }
 }
-
 
 int main() {
   // init data
@@ -295,7 +287,8 @@ int main() {
 
   // instantiate with explicit type
   // not sure how to create a genericDataArray explicitly
-  // mag3Explicit<double, double, double, double>(darray, results);
+  mag3Explicit<vtkAOSDataArrayTemplate<double>,
+               vtkAOSDataArrayTemplate<double>>(darray, results);
 
   // worker and dispatcher, there are three different types of worker
   mag3Dispatch1(darray, results);
