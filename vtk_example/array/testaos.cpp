@@ -1,5 +1,3 @@
-
-
 #include <vtkAOSDataArrayTemplate.h>
 #include <vtkDoubleArray.h>
 #include <vtkPoints.h>
@@ -9,11 +7,9 @@ int main() {
       vtkAOSDataArrayTemplate<double>::New();
 
   int nbOfPoints = 10;
-
   // the components and the tuples are same with the soa part
   // the difference is the memory layout
-  // it contains three components and each components is stored at the separate
-  // array
+  // each tuple contains three components and each components
   pointArray->SetNumberOfComponents(3);
   pointArray->SetNumberOfTuples(nbOfPoints);
 
@@ -28,10 +24,10 @@ int main() {
 
   vtkNew<vtkPoints> points;
   points->SetData(pointArray);
+  //delete and free it manually
   pointArray->Delete();
   // VTKGrid->SetPoints(points);
   // points->DebugOn();
-
   // vtkDebugMacro(<< "try debug macro");
   points->PrintSelf(std::cout, vtkIndent(5));
 
