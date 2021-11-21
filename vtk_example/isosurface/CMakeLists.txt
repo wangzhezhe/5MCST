@@ -11,3 +11,6 @@ IOLegacy
 
 add_executable(test_isosurface test_isosurface.cpp)
 target_link_libraries(test_isosurface ${VTK_LIBRARIES})
+
+add_executable(test_isosurfaceself test_isosurfaceself.cpp vtkMarchingCubesSelf.cxx)
+target_link_libraries(test_isosurfaceself ${VTK_LIBRARIES})
