@@ -1,12 +1,12 @@
-//refer to 
-//https://github.com/Kitware/VTK/blob/master/Common/DataModel/vtkOctreePointLocator.cxx
+// refer to
+// https://github.com/Kitware/VTK/blob/master/Common/DataModel/vtkOctreePointLocator.cxx
 
-//datasets
-//https://github.com/lorensen/VTKExamples/blob/master/src/Testing/Data/treemesh.vtk
-//maybe use the slice to get a specific plane
+// datasets
+// https://github.com/lorensen/VTKExamples/blob/master/src/Testing/Data/treemesh.vtk
+// maybe use the slice to get a specific plane
 
-//online example
-//https://kitware.github.io/vtk-examples/site/Cxx/#octree
+// online example
+// https://kitware.github.io/vtk-examples/site/Cxx/#octree
 
 #include <vtkCellArray.h>
 #include <vtkDataSetCollection.h>
@@ -22,7 +22,8 @@
 #include <vtkUnstructuredGridReader.h>
 #include <vtkPolyDataWriter.h>
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[])
+{
     // Parse command line arguments
     if (argc != 2)
     {
@@ -33,55 +34,58 @@ int main(int argc, char *argv[]){
 
     std::string filename = argv[1];
 
-    //load the unstructured data
-    //vtkSmartPointer<vtkUnstructuredGridReader> reader =
-    //    vtkSmartPointer<vtkUnstructuredGridReader>::New();
-    
-    //load the polydata
+    // load the unstructured data
+    // vtkSmartPointer<vtkUnstructuredGridReader> reader =
+    //     vtkSmartPointer<vtkUnstructuredGridReader>::New();
+
+    // load the polydata
     vtkSmartPointer<vtkPolyDataReader> reader =
         vtkSmartPointer<vtkPolyDataReader>::New();
-    
+
     reader->SetFileName(filename.c_str());
     reader->Update();
-      
+
     // get the specific unstructureGridData and check the results
-    //vtkUnstructuredGrid* grid = reader->GetOutput();
-    vtkPolyData* grid = reader->GetOutput();
+    // vtkUnstructuredGrid* grid = reader->GetOutput();
+    vtkPolyData *grid = reader->GetOutput();
 
     grid->Print(std::cout);
     printf("---\n");
-    //create the oct tree based on the tree mesh
+    // create the oct tree based on the tree mesh
+    // this is only the mesh without the actual data
     vtkNew<vtkOctreePointLocator> octree;
     octree->SetDataSet(grid);
     octree->BuildLocator();
     octree->Print(std::cout);
 
-    //check the representation
+    // check the representation
     printf("---\n");
     int level = octree->GetLevel();
-    printf("Octree level %d\n",level);
+    printf("Octree level %d\n", level);
+    
+    std::string fileTrim = filename.substr(0,filename.length()-4);
 
-    for(int i=0;i<level;i++){
+    for (int i = 0; i < level; i++)
+    {
         vtkNew<vtkPolyData> polydata;
-        octree->GenerateRepresentation(i,polydata);
+        //only print the boundry of the index
+        //without containing the actual data sets
+        octree->GenerateRepresentation(i, polydata);
         polydata->Print(std::cout);
 
         vtkSmartPointer<vtkPolyDataWriter> polywriter =
             vtkSmartPointer<vtkPolyDataWriter>::New();
-        std::string filename = "./oct_poly"+std::to_string(i)+".vtk";
-        polywriter->SetFileName(filename.c_str());
+        std::string octfilename = "./" + fileTrim + "_oct_poly" + std::to_string(i) + ".vtk";
+        polywriter->SetFileName(octfilename.c_str());
 
         // get the specific polydata and check the results
-        // writer->SetInputData???
+        // writer->SetInputData
         polywriter->SetInputData(polydata);
-        //polywriter->SetInputData(delaunay->GetOutputPort());
+        // polywriter->SetInputData(delaunay->GetOutputPort());
 
         // Optional - set the mode. The default is binary.
-        //polywriter->SetDataModeToAscii();
+        // polywriter->SetDataModeToAscii();
         polywriter->Write();
     }
-
-   
-    
     return 0;
 }
