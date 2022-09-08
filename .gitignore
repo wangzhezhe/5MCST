@@ -15,3 +15,5 @@ _deps
 *.vts
 .DS_Store
 build/
+.vscode
+.vscode/

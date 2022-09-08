@@ -9,3 +9,6 @@ set_source_files_properties(example.cxx PROPERTIES LANGUAGE "CUDA")
 add_executable(example example.cxx)
 set_target_properties(example PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 target_link_libraries(example MPI::MPI_CXX)
+
+# set the gcc compiler manually to make the MPI+Cuda compiling works
+# cmake .. -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_COMPILER=gcc
