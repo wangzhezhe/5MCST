@@ -17,3 +17,5 @@ _deps
 build/
 .vscode
 .vscode/
+*.png
+*.pdf
