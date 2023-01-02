@@ -37,7 +37,6 @@ if __name__ == "__main__":
     ax1.set_axisbelow(True)
     ax2.set_axisbelow(True)
 
-
     # set tick
     N = 6
     ind = np.arange(N)    # the x locations for the groups
