@@ -28,7 +28,7 @@ if __name__ == "__main__":
     # use the capsize to control the error bar
     simMeans = (573.421,1098.675,1098.67,1649.21,2977.24)
     simStd = (0.1,0.1,0.1,0.1,0.1)
-    p1 = ax.bar(ind, simMeans,  width, color=[gblue]*5, capsize=3, yerr=simStd)
+    p1 = ax.bar(ind, simMeans,  width, color=[gblue]*5, capsize=3, yerr=simStd, )
 
     checkMeans = (20.053,72.026,72.026,  124.274, 285.972)
     checkStd = ()
