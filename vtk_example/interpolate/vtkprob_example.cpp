@@ -1,7 +1,12 @@
-
-
 // refer to https://kitware.github.io/vtk-examples/site/Cxx/PolyData/InterpolateTerrain/
 // load a polydata and then use the image data to do the interpolation
+
+// another example to set differnet interpolation kernel
+// https://kitware.github.io/vtk-examples/site/Cxx/Meshes/PointInterpolator/
+
+// https://kitware.github.io/vtk-examples/site/Cxx/Meshes/InterpolateFieldDataDemo/
+
+// this is the example that shows how to use the prob func to do the interpolation
 #include <vtkCellArray.h>
 #include <vtkCellLocator.h>
 #include <vtkDelaunay2D.h>
@@ -17,69 +22,98 @@
 #include <vtkProbeFilter.h>
 #include <vtkTriangle.h>
 #include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLImageDataWriter.h>
+#include <vtkStructuredPointsWriter.h>
+#include <vtkStructuredPoints.h>
 
 int main()
 {
-    vtkNew<vtkImageData> image;
-    image->SetExtent(0, 9, 0, 9, 0, 0);
-    image->AllocateScalars(VTK_DOUBLE, 1);
+    vtkNew<vtkStructuredPoints> image;
+    int GridSize = 10;
+    image->SetExtent(0, GridSize-1, 0, GridSize-1, 0, 0);
+    // set dims is same with set extent
+    // image->SetDimensions(dimx, dimy, dimz);
+    image->SetSpacing(1.0, 1.0, 1.0);
+    image->SetOrigin(0.0, 0.0, 0.0);
 
     // Create a random set of heights on a grid. This is often called a
-    //"terrain map"
-    vtkNew<vtkPoints> points;
+    // "terrain map"
+    vtkNew<vtkDoubleArray> VarArray;
 
-    vtkNew<vtkMinimalStandardRandomSequence> randomSequence;
-    randomSequence->SetSeed(8775070);
-    unsigned int GridSize = 10;
+    VarArray->SetName("v_sin");
+    VarArray->SetNumberOfComponents(1);
+
+    double center[3] = {GridSize / 2.0, GridSize / 2.0, 0.0};
+
+    // the number of point in each dim is gridsize
     for (unsigned int x = 0; x < GridSize; x++)
     {
         for (unsigned int y = 0; y < GridSize; y++)
         {
-            double val = randomSequence->GetRangeValue(-1, 1);
-            randomSequence->Next();
-            points->InsertNextPoint(x, y, val);
-            image->SetScalarComponentFromDouble(x, y, 0, 0, val);
+            // compute the value based on the xyz
+            double distToCenter = sqrt(pow(x - center[0], 2) + pow(y - center[1], 2));
+            VarArray->InsertNextValue(distToCenter);
         }
     }
 
+    auto dataset = image->GetPointData();
+    dataset->AddArray(VarArray);
+
     // add the grid points to a polydata object
-    vtkNew<vtkPolyData> polydata;
-    polydata->SetPoints(points);
+    // vtkNew<vtkPolyData> polydata;
+    // polydata->SetPoints(points);
 
     // triangulate the grid points
     // get the polygonal data by this way
-    vtkNew<vtkDelaunay2D> delaunay;
-    delaunay->SetInputData(polydata);
-    delaunay->Update();
+    // vtkNew<vtkDelaunay2D> delaunay;
+    // delaunay->SetInputData(polydata);
+    // delaunay->Update();
 
-    vtkNew<vtkXMLPolyDataWriter> writer;
-    writer->SetFileName("surface.vtp");
-    writer->SetInputConnection(delaunay->GetOutputPort());
+    vtkNew<vtkStructuredPointsWriter> writer;
+    writer->SetFileName("source_image.vtk");
+    writer->SetInputData(image);
     writer->Write();
 
-    // Add some points to interpolate
-    vtkNew<vtkPoints> probePoints;
-    probePoints->InsertNextPoint(5.2, 3.2, 0);
-    probePoints->InsertNextPoint(5.0, 3.0, 0);
-    probePoints->InsertNextPoint(0.0, 0.0, 0);
+    // new grid
+    vtkNew<vtkStructuredPoints> newImage;
+    //there are 19 points
+    int newGridSize = 19;
+    //newImage->SetExtent(0, newGridSize-1, 0, newGridSize-1, 0, 0);
+    // either set the dim or the extent
+    // if the dim is gridsize, the extent is from 0 to gridsize
+    image->SetDimensions(newGridSize, newGridSize, 0);
+    newImage->SetSpacing(0.5,0.5,0.5);
+    newImage->SetOrigin(0.0, 0.0, 0.0);
 
-    vtkNew<vtkPolyData> probePolyData;
-    probePolyData->SetPoints(probePoints);
-
+    // VTK/Filters/Core
     vtkNew<vtkProbeFilter> probe;
     probe->SetSourceData(image);
-    probe->SetInputData(probePolyData);
+    probe->SetInputData(newImage);
     probe->Update();
 
+    // getoutput data from the prob
+    vtkDataSet* probedData = probe->GetOutput();
+    if (probedData==nullptr){
+        std::cout << "failed to get probed data" << std::endl;
+        exit(0);
+    }
+    
+    probedData->Print(std::cout);
+
+
+
+    // auto newDataset = newImage->GetPointData();
+    // newDataset->AddArray(doubleDataArray);
+
     // write out the image data
-    vtkSmartPointer<vtkXMLImageDataWriter> writer = vtkSmartPointer<vtkXMLImageDataWriter>::New();
-    writer->SetFileName("surface_image_sample.vtk");
+    vtkSmartPointer<vtkStructuredPointsWriter> probDataWriter = vtkSmartPointer<vtkStructuredPointsWriter>::New();
+    probDataWriter->SetFileName("interp_image.vtk");
 
     // get the specific image and check the results
-    writer->SetInputData(image);
-    // writer->SetInputData(importer->GetOutputPort());
+    // imgwriter->SetInputData(image);
+    probDataWriter->SetInputData(probedData);
     // Optional - set the mode. The default is binary.
-    writer->SetDataModeToBinary();
+    // imgwriter->SetDataModeToBinary();
     // writer->SetDataModeToAscii();
-    writer->Write();
+    probDataWriter->Write();
 }
