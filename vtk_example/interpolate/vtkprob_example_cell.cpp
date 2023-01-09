@@ -78,15 +78,19 @@ int main()
     vtkNew<vtkStructuredPoints> newImage;
     //there are 19 points
     int newGridSize = 19;
-    //newImage->SetExtent(0, newGridSize-1, 0, newGridSize-1, 0, 0);
+    newImage->SetExtent(0, newGridSize-1, 0, newGridSize-1, 0, 0);
     // either set the dim or the extent
     // if the dim is gridsize, the extent is from 0 to gridsize
-    image->SetDimensions(newGridSize, newGridSize, 0);
+    // when we set dims instead of extent, the last one should be 1
+    //newImage->SetDimensions(newGridSize, newGridSize, 1);
     newImage->SetSpacing(0.5,0.5,0.5);
     newImage->SetOrigin(0.0, 0.0, 0.0);
 
     // VTK/Filters/Core
     vtkNew<vtkProbeFilter> probe;
+
+    // input is the empty grid which we need to fill in
+    // the source is the original grid which we try to sample from
     probe->SetSourceData(image);
     probe->SetInputData(newImage);
     probe->Update();
@@ -99,7 +103,6 @@ int main()
     }
     
     probedData->Print(std::cout);
-
 
 
     // auto newDataset = newImage->GetPointData();
