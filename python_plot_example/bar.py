@@ -41,9 +41,9 @@ if __name__ == "__main__":
     # add the lengend for the data by defualt
     #ax.legend((p1[0], p2[0], p3[0]), ('data generating', 'data checking','data analytics'), fontsize='large')
     
-    # customize the legend
+    #The following code shows how to customize the legend manually based on capability of Patch
     #legend_elem_1 = [Patch(facecolor='#B4E1FF', edgecolor='black', label='label1'),
-    #                     Patch(facecolor='#AB87FF', edgecolor='black', label='label2')]
+    #                 Patch(facecolor='#AB87FF', edgecolor='black', label='label2')]
     #legend1 = plt.legend(handles=legend_elem_1, loc='upper center', ncol=2, bbox_to_anchor=(0.475, 1.0), fontsize=12)
     #ax.add_artist(legend1)
     
