@@ -70,8 +70,13 @@ if __name__ == "__main__":
 
     vtkarray = numpy_support.numpy_to_vtk(np.array(diff_list))
     vtkarray.SetName("diff")
+    vtkarray.SetNumberOfComponents(1)
+
 
     print(vtkarray)
    
     structured_dataset.GetCellData().AddArray(vtkarray)
+    # remember to set the activeScalar field to make sure the 
+    # output data field can be detected by paraview
+    structured_dataset.GetPointData().SetActiveScalars("diff")
     writeStructuredDs("wind_cross_prob_diff.vtk",structured_dataset)

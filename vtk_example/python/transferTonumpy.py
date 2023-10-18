@@ -57,6 +57,8 @@ if __name__ == "__main__":
     vtkarray.SetName("pointArray")
    
     structured_dataset.GetPointData().AddArray(vtkarray)
+    structured_dataset.GetPointData().SetActiveScalars("pointArray")
+
     # this output use the most general datset writer which is 5.1 version
     writeDS("test_raw_10_20_30.vtk",structured_dataset)
     # this output use the specific structured point data set writer

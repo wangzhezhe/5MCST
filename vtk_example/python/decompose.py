@@ -113,6 +113,8 @@ if __name__ == "__main__":
     vtkarray = numpy_support.numpy_to_vtk(np.array(point_array))
     vtkarray.SetName("point_value")   
     structured_dataset.GetPointData().AddArray(vtkarray)
+    structured_dataset.GetPointData().SetActiveScalars("point_value")
+
 
     writeDS ("temp_testdata.vtk", structured_dataset)
     print(structured_dataset)
