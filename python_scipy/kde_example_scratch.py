@@ -6,7 +6,8 @@
 
 # code come from here, a really good blog
 # https://billc.io/2023/01/kde-from-scratch/
-
+# This is another good tutorial
+# https://bookdown.org/egarpor/NP-UC3M/kde-ii-mult.html
 from matplotlib import pyplot
 from numpy.random import normal
 import numpy as np
@@ -46,6 +47,7 @@ def kernel(k: str):
 # three ways to find the suitable h
 def bw_scott(data: np.ndarray):
     std_dev = np.std(data, axis=0, ddof=1)
+    print("std_dev",std_dev)
     n = len(data)
     return 3.49 * std_dev * n ** (-0.333)
 
@@ -91,6 +93,7 @@ def kde(data, k=None, h=None, x=None):
         np.ndarray: Kernel density estimation.
     """
     # line space is between the min and max of the input data
+    # it means how many samples at x axis
     if x is None:
         x = np.linspace(np.min(data), np.max(data), 1000)
     if h is None:
@@ -113,12 +116,43 @@ sample1 = normal(loc=20, scale=5, size=300)
 sample2 = normal(loc=40, scale=5, size=700)
 sample = hstack((sample1, sample2))
 
+#print(sample)
+
 # get the range of the data
 x_points = np.linspace(np.min(sample), np.max(sample), 1000)
-pyplot.hist(sample, bins=50, density=True)
+#pyplot.hist(sample, bins=50, density=True)
 
-# pay attention, this kde_result is actually the histogram 
+# pay attention, this kde_result is actually the histogram
+# the input is the original data
+# the x is the sampled data we want to extract from the histogram 
 kde_result=kde(sample)
 # this is the histogram results
+#pyplot.plot(x_points,kde_result)
+#pyplot.savefig('kde_sample_results.png')
+
+
+# test the bw_scott 
+test_x_points = np.linspace(1, 10, 10)
+print(test_x_points)
+print("bw_scott", bw_scott(test_x_points))
+
+
+test_x_points_2 = np.linspace(0, 1, 3)
+print(test_x_points_2)
+k = kernel('gaussian')
+print('gaussian', k(test_x_points_2))
+
+# the input value for x
+sampleTestList=[23.40953488,20.06452322,14.63870771,21.61275585,29.82232875,11.23601927]
+targetedX=np.array([10.0,15.0,20.0])
+#targetedX=np.linspace(np.min(sampleTestList), np.max(sampleTestList), 1000)
+sampleTestKde=kde(sampleTestList,k=kernel('gaussian'), h=bw_scott(sampleTestList), x=targetedX)
+print(sampleTestKde)
+
+
+#draw figure to show results
+print("test bw_scott for new data", bw_scott(sampleTestList))
+x_points = np.linspace(np.min(sampleTestList), np.max(sampleTestList), 100)
+kde_result=kde(sampleTestList,k=kernel('gaussian'), h=bw_scott(sampleTestList), x=x_points)
 pyplot.plot(x_points,kde_result)
-pyplot.savefig('kde_sample_results.png')
+pyplot.savefig('kde_sample_results_temp.png')
