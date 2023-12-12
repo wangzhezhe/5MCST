@@ -21,3 +21,6 @@ build/
 *.pdf
 *.visit
 .DS_Store
+build/
+install/
+src/
