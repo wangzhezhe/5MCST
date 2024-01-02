@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   // regular streamlines
   //
   vtkNew<vtkLineSource> line;
-  line->SetResolution(50);
+  line->SetResolution(10);
   line->SetPoint1(0.08, 2.50, 0.71);
   line->SetPoint2(0.08, 4.50, 0.71);
 
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
   // streamers->DebugOn();
   streamers->SetInputConnection(reader->GetOutputPort());
   streamers->SetSourceConnection(line->GetOutputPort());
-  streamers->SetMaximumPropagation(1000);
+  streamers->SetMaximumPropagation(100);
   streamers->SetInitialIntegrationStep(.5);
   streamers->SetMinimumIntegrationStep(.1);
   streamers->SetIntegratorType(2);
