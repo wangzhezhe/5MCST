@@ -2,7 +2,7 @@
 
 set -e
 HERE=`pwd`
-build_jobs=6
+build_jobs=8
 
 SOFTWARE_SRC_DIR="$HERE/src"
 SOFTWARE_BUILD_DIR="$HERE/build"
@@ -54,7 +54,7 @@ else
     -DVTKm_ENABLE_MPI=ON \
     -DVTKm_ENABLE_OPENMP=OFF \
     -DVTKm_ENABLE_LOGGING=ON \
-    -DVTKm_ENABLE_RENDERING=OFF \
+    -DVTKm_ENABLE_RENDERING=ON \
     -DVTKm_ENABLE_TESTING=OFF 
     cmake --build ${VTKM_BUILD_DIR} -j${build_jobs}
 
