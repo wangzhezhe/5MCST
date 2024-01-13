@@ -24,4 +24,7 @@ build/
 build/
 install/
 src/
+*data
+*.vtpd
+*.vti
 
