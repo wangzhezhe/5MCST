@@ -16,6 +16,7 @@ def readDS(fname) :
 if __name__ == "__main__":
 
     filename = sys.argv[1]
+    outputname = sys.argv[2]
     ds=readDS(filename)
     #print(ds)
 
@@ -93,7 +94,7 @@ if __name__ == "__main__":
     bpIO.set_engine("BPFile")
     a = bpIO.adios()
     # ADIOS output stream
-    with adios2.Stream(bpIO, "airfoil_rot_30_slice_60.bp", "w") as fh:
+    with adios2.Stream(bpIO, outputname+".bp", "w") as fh:
         # name, data, shape, start, count
         # write variable
         fh.write("CoordinateX", coordsx, [num_points], [0], [num_points])
