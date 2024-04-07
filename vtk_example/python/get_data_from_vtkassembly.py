@@ -16,7 +16,11 @@ def readDS(fname) :
 if __name__ == "__main__":
 
     filename = sys.argv[1]
+<<<<<<< HEAD
     outputname = sys.argv[2]
+=======
+    output_bp_name=sys.argv[2]
+>>>>>>> 64464b1 (update graph figure)
     ds=readDS(filename)
     #print(ds)
 
@@ -94,7 +98,11 @@ if __name__ == "__main__":
     bpIO.set_engine("BPFile")
     a = bpIO.adios()
     # ADIOS output stream
+<<<<<<< HEAD
     with adios2.Stream(bpIO, outputname+".bp", "w") as fh:
+=======
+    with adios2.Stream(bpIO, output_name, "w") as fh:
+>>>>>>> 64464b1 (update graph figure)
         # name, data, shape, start, count
         # write variable
         fh.write("CoordinateX", coordsx, [num_points], [0], [num_points])
@@ -105,7 +113,7 @@ if __name__ == "__main__":
         fh.write("Uy", coordsy, [num_points], [0], [num_points])
         fh.write("Uz", coordsz, [num_points], [0], [num_points])
 
-        fh.write("pressure", point_nparray_p, [var_p_size], [0], [var_p_size])
+        fh.write("Pressure", point_nparray_p, [var_p_size], [0], [var_p_size])
 
     # TODO, adding connectivity and offset as needed
     # https://github.com/wangzhezhe/Gorilla/blob/master/test/BlockData/test_vtkexplicitzero.cpp

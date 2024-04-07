@@ -1,0 +1,6 @@
+digraph hello {
+	Hello
+	World
+	Hello -> World [label=123]
+	World -> Hello [label=456]
+}
