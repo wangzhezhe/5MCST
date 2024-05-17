@@ -1,5 +1,5 @@
 # this script first resample the data into the 
-# didicated dims and then decompose the files
+# dedicated dims and then decompose the files
 # the original dims of the file might not be suitable
 # to be divided into equal sizes.
 
