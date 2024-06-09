@@ -29,3 +29,4 @@ src/
 *.vti
 *.bp/
 vtk_example/.DS_Store
+*.vtk
