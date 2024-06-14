@@ -63,13 +63,14 @@ SetActiveView(renderView1)
 
 
 # create a new 'NetCDF Reader'
-netCDFReader1 = NetCDFReader(FileName=['/Users/zw1/Downloads/redsea_raw/0001/COMBINED_2011013100.nc'])
+
+netCDFReader1 = NetCDFReader(FileName=['/Users/zhewang/Downloads/redsea_raw/0010/COMBINED_2011013100.nc'])
 netCDFReader1.Dimensions = '(Z_MIT40, YG, XC)'
 netCDFReader1.SphericalCoordinates = 0
 
 
 # create a new 'XDMF Reader'
-xDMFReader1 = XDMFReader(FileNames=['/Users/zw1/Downloads/redsea_raw/bathymetry.xmf'])
+xDMFReader1 = XDMFReader(FileNames=['/Users/zhewang/Downloads/redsea_raw/bathymetry.xmf'])
 xDMFReader1.PointArrayStatus = ['depth']
 xDMFReader1.GridStatus = ['Grid']
 
@@ -81,13 +82,13 @@ warpByScalar1.ScaleFactor = 0.00025
 
 
 # create a new 'NetCDF Reader'
-netCDFReader3 = NetCDFReader(FileName=['/Users/zw1/Downloads/redsea_raw/0001/COMBINED_2011013100.nc'])
+netCDFReader3 = NetCDFReader(FileName=['/Users/zhewang/Downloads/redsea_raw/0010/COMBINED_2011013100.nc'])
 netCDFReader3.Dimensions = '(Z_MIT40, YC, XG)'
 netCDFReader3.SphericalCoordinates = 0
 
 
 # create a new 'NetCDF Reader'
-netCDFReader2 = NetCDFReader(FileName=['/Users/zw1/Downloads/redsea_raw/0001/COMBINED_2011013100.nc'])
+netCDFReader2 = NetCDFReader(FileName=['/Users/zhewang/Downloads/redsea_raw/0010/COMBINED_2011013100.nc'])
 netCDFReader2.Dimensions = '(Z_MIT40, YC, XC)'
 netCDFReader2.SphericalCoordinates = 0
 
