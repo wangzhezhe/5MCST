@@ -1,7 +1,15 @@
 
 This online documents contain all aspects about the vtk python wrapper
 
-https://vtk.org/doc/nightly/html/md__builds_gitlab_kitware_sciviz_ci_Documentation_Doxygen_PythonWrappers.html
+https://docs.vtk.org/en/latest/advanced/PythonWrappers.html
+
+Two special case:
+
+
+New object
+
+Return vaue
+
 
 It is more efficient to use python binding if we care about the flexibility instead of the efficiency of the program
 
