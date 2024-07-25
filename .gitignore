@@ -30,3 +30,4 @@ src/
 *.bp/
 vtk_example/.DS_Store
 *.vtk
+build/
