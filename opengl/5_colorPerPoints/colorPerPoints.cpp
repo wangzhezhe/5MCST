@@ -1,11 +1,10 @@
-// follow this link
-// https://learnopengl.com/Getting-started/Hello-Triangle
-
-// Several questions here
-// 1 The meaning of the projection division
-// 2 The relatipnship between VAO and glVertexAttribPointer
-// 3 What does the each parameter of glVertexAttribPointer mean, why the first one is 0
-//   what is relationship with the local in vertex shader
+// refer to this tutorial
+// https://learnopengl-cn.github.io/01%20Getting%20started/05%20Shaders/
+// assign one color for each vertex
+// there are two attributed for each vertex in vertex bufffer
+// Attention! The fragment interpolation is executed by opengl automatically
+// We just need to specify the value on each vertex (by default, opengl uses the linear interpoation)
+// commonly used techniques here is Barycentric Coordinates as the interpolation.
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -126,13 +125,14 @@ int main(void)
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // normalized device coordinates between -1 to 1
-    // Any coordinates that fall outside this range will be discarded/clipped
-    // and won't be visible on your screen
-    float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
+    // vertex coordinates with color
+    // for each vertex
+    // the first three values are x,y,z of vertex
+    // the next three values are color of vertex
+    float verticesWithColor[] = {
+        -0.5f, -0.5f, 0.0f, 1.0f,0.0f,0.0f,
+        0.5f, -0.5f, 0.0f, 0.0f,1.0f,0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,0.0f,1.0f,};
 
     // create the vbo for managing vertecies
     // it needs three API to complete one memory copy to device\s
@@ -148,7 +148,7 @@ int main(void)
     // last one represents how GPU manages the data
     // GL_STATIC_DRAW: the data is set only once and used many times.
     // two other types are GL_STREAM_DRAW and GL_DYNAMIC_DRAW
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesWithColor), verticesWithColor, GL_STATIC_DRAW);
 
     // populate info into VAO to explain how to parser the array
     // we need to manually specify which part of vbo goes to which vertex element
@@ -159,12 +159,15 @@ int main(void)
     // glVertexAttribPointer will be applied to binded VAO
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
+
     // set the layout of the VAO
-    // it tells opengl how to get data from first attribute (attribute 0) in vertex shader, there may include multiple attributes
-    // there are three elements per attributed, sthe type of data is float
-    // normalized is false and the size of stride is 3*sizeof(float)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
+    // for second asstribute, the location is 1 and the start position is 3 elements
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -179,12 +182,12 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
+        // activate the shader
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        glBindVertexArray(0);
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
         /* Poll for and process events */
