@@ -24,7 +24,6 @@ Then using the decompose.py to extract the ensmeble members by each layer.
 
 Each layer is an ensemble element in this situation.
 
-
 Extracting data through paraview (although it is ok to use pvbatch, executing these code through paraview direactly can avoid some depedency error)
 
 ```

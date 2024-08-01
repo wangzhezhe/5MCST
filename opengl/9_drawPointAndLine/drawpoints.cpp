@@ -1,11 +1,5 @@
-// follow this link
-// https://learnopengl.com/Getting-started/Hello-Triangle
-
-// Several questions here
-// 1 The meaning of the projection division
-// 2 The relatipnship between VAO and glVertexAttribPointer
-// 3 What does the each parameter of glVertexAttribPointer mean, why the first one is 0
-//   what is relationship with the local in vertex shader
+// Refer to this link
+// https://learnopengl-cn.github.io/01%20Getting%20started/07%20Transformations/
 
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -16,6 +10,13 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 #endif
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 std::string LoadShaderAsSring(const std::string fileName)
 {
@@ -57,7 +58,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Draw lines", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -66,8 +67,6 @@ int main(void)
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
-
-    // init the buffer
 
     // load the shader file and compile it
     std::string vertexShaderSrc = LoadShaderAsSring("../vertex_shader.glsl");
@@ -142,6 +141,7 @@ int main(void)
     // No buffer objects are associated with the returned buffer object names
     // until they are first bound by calling glBindBuffer.
     glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+
     // copy data into buffer
     // parameters:
     // type of buffer, size of data we want to send, pointer of sending data
@@ -164,6 +164,7 @@ int main(void)
     // there are three elements per attributed, sthe type of data is float
     // normalized is false and the size of stride is 3*sizeof(float)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    // Attention! enable this if there are attributes in vertex shader
     glEnableVertexAttribArray(0);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -177,17 +178,26 @@ int main(void)
     {
         // gl api to draw things
         /* Render here */
-        //ClearColor can help to set background color
-        //when the color buffer is cleared
-        //set buffer as the a value specified here
+        // ClearColor can help to set background color
+        // when the color buffer is cleared
+        // set buffer as the a value specified here
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glEnable(GL_PROGRAM_POINT_SIZE);
         
+        //Attention!!! using GL_POINTS here instead of GL_POINT
+        //according to this 
+        //https://stackoverflow.com/questions/35742382/points-are-not-drawn
+        //GL_POINT and GL_LINE is used for switching the rendering mode
+        //glDrawArrays(GL_POINTS, 0, 3);
+        //using thie enum to draw lines
+        glDrawArrays(GL_LINES, 0, 2);
         glBindVertexArray(0);
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
         /* Poll for and process events */

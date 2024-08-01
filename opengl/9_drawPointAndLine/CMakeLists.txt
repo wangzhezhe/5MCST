@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.5)
-project (BasicTexture LANGUAGES CXX)
+project (drawpoints LANGUAGES CXX)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
@@ -9,5 +9,5 @@ find_package(glfw3 REQUIRED)
 message(${OPENGL_LIBRARY})
 #message(${GLAD_LIBRARY})
 
-add_executable(BasicTexture BasicTexture.cpp)
-target_link_libraries(BasicTexture PUBLIC glfw ${OPENGL_LIBRARY})
+add_executable(drawpoints drawpoints.cpp)
+target_link_libraries(drawpoints PUBLIC glfw ${OPENGL_LIBRARY})
