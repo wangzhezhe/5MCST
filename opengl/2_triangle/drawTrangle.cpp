@@ -7,7 +7,10 @@
 // 3 What does the each parameter of glVertexAttribPointer mean, why the first one is 0
 //   what is relationship with the local in vertex shader
 
+#include <glad/glad.h>
+// GLFW (include after glad)
 #include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -16,6 +19,48 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/gl3ext.h>
 #endif
+
+#define NOINTERACTIVE
+
+// https://www.david-amador.com/2012/09/how-to-take-screenshot-in-opengl/
+bool save_screenshot(std::string filename, int w, int h)
+{
+    // This prevents the images getting padded
+    // when the width multiplied by 3 is not a multiple of 4
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+    int nSize = w * h * 3;
+    // First let's create our buffer, 3 channels per Pixel
+    char *dataBuffer = (char *)malloc(nSize * sizeof(char));
+
+    if (!dataBuffer)
+        return false;
+
+    // Let's fetch them from the backbuffer
+    // We request the pixels in GL_BGR format, thanks to Berzeger for the tip
+    glReadPixels((GLint)0, (GLint)0,
+                 (GLint)w, (GLint)h,
+                 GL_BGR, GL_UNSIGNED_BYTE, dataBuffer);
+
+    // Now the file creation
+    FILE *filePtr = fopen(filename.c_str(), "wb");
+    if (!filePtr)
+        return false;
+
+    unsigned char TGAheader[12] = {0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    unsigned char header[6] = {w % 256, w / 256,
+                               h % 256, h / 256,
+                               24, 0};
+    // We write the headers
+    fwrite(TGAheader, sizeof(unsigned char), 12, filePtr);
+    fwrite(header, sizeof(unsigned char), 6, filePtr);
+    // And finally our image data
+    fwrite(dataBuffer, sizeof(GLubyte), nSize, filePtr);
+    fclose(filePtr);
+    free(dataBuffer);
+
+    return true;
+}
 
 std::string LoadShaderAsSring(const std::string fileName)
 {
@@ -56,24 +101,39 @@ int main(void)
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    int width = 640;
+    int height = 480;
+
+    // Create a windowed mode window and its OpenGL context
+    window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         return -1;
     }
 
-    /* Make the window's context current */
+    // Make the window's context current
     glfwMakeContextCurrent(window);
+
+    // setting loader after window!!!
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        printf("Something went wrong for gladLoader!\n");
+        exit(-1);
+    }
+    printf("OpenGL load  %d.%d\n", GLVersion.major, GLVersion.minor);
+
+    // -- snip --
 
     // init the buffer
 
     // load the shader file and compile it
     std::string vertexShaderSrc = LoadShaderAsSring("../vertex_shader.glsl");
+
     // create shader object
     unsigned int vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
+
     // attach shader source to the shader object
     const char *vertexShaderPtr = vertexShaderSrc.c_str();
     glShaderSource(vertexShader, 1, &vertexShaderPtr, NULL);
@@ -90,6 +150,17 @@ int main(void)
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n"
                   << infoLog << std::endl;
     }
+    
+    //quering information of the opengl to make sure
+    //it is crearted by cpu or gpu, if the vendor is mesa
+    //it is created by cpu
+    const GLubyte *vendor = glGetString(GL_VENDOR);
+    const GLubyte *renderer = glGetString(GL_RENDERER);
+    const GLubyte *version = glGetString(GL_VERSION);
+
+    printf("Vendor: %s\n", vendor);
+    printf("Renderer: %s\n", renderer);
+    printf("Version: %s\n", version);
 
     // load the fragment shader and compile it
     // use similar way to check if compilation is successful
@@ -172,27 +243,42 @@ int main(void)
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
-    /* Loop until the user closes the window */
+    // non interactive mode
+
+    // Make the BYTE array, factor of 3 because it's RBG.
+
+    // noninteractive mode, render figure and draw it as tga file
+#ifdef NOINTERACTIVE
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    save_screenshot(std::string("./test.tga"), width, height);
+#else
+    // Loop until the user closes the window
     while (!glfwWindowShouldClose(window))
     {
         // gl api to draw things
-        /* Render here */
-        //ClearColor can help to set background color
-        //when the color buffer is cleared
-        //set buffer as the a value specified here
+        // Render here
+        // ClearColor can help to set background color
+        // when the color buffer is cleared
+        // set buffer as the a value specified here
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-        
+
         glBindVertexArray(0);
-        /* Swap front and back buffers */
+        // Swap front and back buffers
         glfwSwapBuffers(window);
-        /* Poll for and process events */
+        // Poll for and process events
         glfwPollEvents();
     }
+#endif
 
     glfwTerminate();
     return 0;

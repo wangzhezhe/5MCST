@@ -33,3 +33,32 @@ https://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 Barycentric coordinates to do the interpolation
 
 http://courses.cms.caltech.edu/cs171/assignments/hw2/hw2-notes/notes-hw2.html
+
+
+Dep on linux
+
+glfw
+
+sudo apt-get install libglfw3
+sudo apt-get install libglfw3-dev
+
+glew
+sudo apt-get install libglew-dev
+
+there is 65544 without monitor
+
+offscreen pattern
+https://stackoverflow.com/questions/73318855/opengl-context-without-a-monitor
+
+write out the image by opengl pixel reader
+
+Tips for glad, there is 1.0 version and 2.0 version
+
+Glad should be loaded after gl version is specified, this is important!!!
+
+Taking screenshot in opengl
+
+https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl
+
+todo, current screen get two values
+RGBA and DEPTH

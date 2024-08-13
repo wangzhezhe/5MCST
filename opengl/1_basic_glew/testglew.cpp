@@ -5,14 +5,18 @@
 //this code just start an window and draw nothing
 
 #include <GLFW/glfw3.h>
+#include <cstdio>
 
 int main(void)
 {
     GLFWwindow* window;
 
     /* Initialize the library */
-    if (!glfwInit())
+    if (!glfwInit()){
+        int err = glfwGetError(NULL);
+        printf("glfwInit init fail, error code is %d\n",err);
         return -1;
+    }
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
