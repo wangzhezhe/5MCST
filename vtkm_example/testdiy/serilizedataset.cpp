@@ -100,17 +100,24 @@ int main(int argc, char *argv[])
     vtkm::cont::DataSet inData = createDataSet();
 
     // serilizae data set
-    std::cout << "original dataset before serilization" << std::endl;
-    // inData.PrintSummary(std::cout);
+    std::cout << "---Original dataset before serilization" << std::endl;
+    inData.PrintSummary(std::cout);
 
+    std::cout << "---Testing data serilization" << std::endl;
+
+    // mangled_diy_namespace::MemoryBuffer bb;
     mangled_diy_namespace::MemoryBuffer bb;
-    mangled_diy_namespace::Serialization<vtkm::cont::DataSet> serialization;
+    mangled_diy_namespace::Serialization<DataSetWrapper> serialization;
 
-    serialization.save(bb, inData);
+    vtkmdiy::save(bb, DataSetWrapper{inData});
 
-    vtkm::cont::DataSet dataDeserilized;
-    serialization.load(bb, dataDeserilized);
-    dataDeserilized.PrintSummary(std::cout);
+    // vtkm::cont::DataSet dataDeserilized;
+
+    DataSetWrapper dataDeserilized;
+
+    // need to set cell type
+    vtkmdiy::load(bb, dataDeserilized);
+    // dataDeserilized.PrintSummary(std::cout);
 
     // vtkmdiy::MemoryBuffer bb;
     // vtkmdiy::save(bb, inData);
@@ -124,5 +131,5 @@ int main(int argc, char *argv[])
     // std::cout << "deserilized dataset:" << std::endl;
 
     // inDataDeserilized.PrintSummary(std::cout);
-    TestSerialization(inData);
+    // TestSerialization(inData);
 }
